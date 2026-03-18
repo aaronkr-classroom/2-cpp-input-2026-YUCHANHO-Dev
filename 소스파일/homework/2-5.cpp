@@ -27,31 +27,46 @@
 // }
 
 #include <iostream>
+#include <limits> // 입력 버퍼를 완벽하게 비우기 위해 추가
 
 using std::cout;
 using std::cin;
 using std::endl;
 
 int main() {
-    // 전체 프로그램을 무한 루프로 감쌉니다.
     while (true) {
         int mainChoice;
 
-        // 1단계: 메인 메뉴 (도형 선택)
         cout << "출력할 도형을 선택하세요." << endl;
         cout << "1. 사각형" << endl;
         cout << "2. 삼각형" << endl;
         cout << "선택: ";
         cin >> mainChoice;
 
+        // --- 🚨 입력 오류 방어 코드 시작 ---
+        if (cin.fail()) {
+            cin.clear(); // 1. 에러 상태를 초기화하여 정상 작동하도록 복구
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // 2. 버퍼에 남은 잘못된 입력(엔터 치기 전까지의 모든 문자) 비우기
+            cout << "잘못된 입력입니다. 숫자만 입력해 주세요.\n\n";
+            continue; // 3. 밑으로 내려가지 않고 루프의 처음(메인 메뉴)으로 돌아감
+        }
+        // --- 입력 오류 방어 코드 끝 ---
+
         if (mainChoice == 1) {
-            // 2단계: 사각형 서브 메뉴
             int subChoice;
             cout << "\n어떤 사각형을 출력하시겠습니까?" << endl;
             cout << "1. 정사각형" << endl;
             cout << "2. 직사각형" << endl;
             cout << "선택: ";
             cin >> subChoice;
+
+            // 서브 메뉴에도 동일한 방어 코드 적용
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                cout << "잘못된 입력입니다. 숫자만 입력해 주세요.\n\n";
+                continue; 
+            }
 
             if (subChoice == 1) {
                 cout << "\n[정사각형]" << endl;
@@ -82,7 +97,6 @@ int main() {
             }
 
         } else if (mainChoice == 2) {
-            // 2단계: 삼각형 서브 메뉴
             int subChoice;
             cout << "\n어떤 삼각형을 출력하시겠습니까?" << endl;
             cout << "1. 올바른 삼각형" << endl;
@@ -90,18 +104,21 @@ int main() {
             cout << "선택: ";
             cin >> subChoice;
 
+            if (cin.fail()) {
+                cin.clear();
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                cout << "잘못된 입력입니다. 숫자만 입력해 주세요.\n\n";
+                continue; 
+            }
+
             if (subChoice == 1) {
                 cout << "\n[올바른 삼각형]" << endl;
                 int size = 4;
                 for (int i = 0; i < size; ++i) {
                     for (int j = 0; j < (2 * size - 1); ++j) {
-                        if (i == size - 1) {
-                            cout << "*";
-                        } else if (j == (size - 1) - i || j == (size - 1) + i) {
-                            cout << "*";
-                        } else {
-                            cout << " ";
-                        }
+                        if (i == size - 1) cout << "*";
+                        else if (j == (size - 1) - i || j == (size - 1) + i) cout << "*";
+                        else cout << " ";
                     }
                     cout << endl;
                 }
@@ -110,13 +127,9 @@ int main() {
                 int size = 4; 
                 for (int i = 0; i < size; ++i) {
                     for (int j = 0; j < (2 * size); ++j) {
-                        if (i == 0 && j < (2 * size - 1)) {
-                            cout << "*";
-                        } else if (j == i || j == (2 * size - 2 - i)) {
-                            cout << "*";
-                        } else if (j < (2 * size - 1)) {
-                            cout << " ";
-                        }
+                        if (i == 0 && j < (2 * size - 1)) cout << "*";
+                        else if (j == i || j == (2 * size - 2 - i)) cout << "*";
+                        else if (j < (2 * size - 1)) cout << " ";
                     }
                     cout << endl;
                 }
@@ -128,18 +141,16 @@ int main() {
             cout << "잘못 선택했습니다." << endl;
         }
 
-        // --- 반복 여부 확인 로직 추가 ---
+        // 반복 여부 확인 로직
         char continueChoice;
         cout << "\n다른 도형을 계속 출력하시겠습니까? (y/n): ";
         cin >> continueChoice;
 
-        // 사용자가 'n' 또는 'N'을 입력하면 루프를 탈출합니다.
         if (continueChoice == 'n' || continueChoice == 'N') {
             cout << "프로그램을 종료합니다." << endl;
             break; 
         }
         
-        // 다음 출력을 위해 화면을 깔끔하게 구분선으로 나눕니다.
         cout << "\n----------------------------------------\n\n";
     }
 
